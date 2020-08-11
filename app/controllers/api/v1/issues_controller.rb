@@ -7,7 +7,7 @@ class Api::V1::IssuesController < ApplicationController
   def index
     @issues = fetch_department
     # @issues = Issue.page(params[:page]).per(params[:per_page])
-    json_response 'Index issue successfully', true, { issues: @issues }, :ok
+    json_response 'Index issue successfully', true, { issues: @issues }, 200
   end
 
   def fetch_department
@@ -30,25 +30,18 @@ class Api::V1::IssuesController < ApplicationController
   end
 
   def show
-    json_response 'Show issue Successfully', true, { issue: @issue }, :ok
+    json_response 'Show issue Successfully', true, { issue: @issue }, 200
   end
-
-  def new
-    @issue = Issue.new
-    json_response 'new issue', true, { issue: @issue }, :ok
-  end
-
-  def edit; end
 
   def create
     @issue = Issue.new(issue_params)
     if @issue.save
       json_response(
-        'Issue was successfully created.', true, { issue: @issue }, :ok
+        'Issue was successfully created.', true, { issue: @issue }, 200
       )
     else
       json_response(
-        'Something wrong', false, {}, :unprocessable_entity,
+        'Something wrong', false, {}, 422,
         errors: @issue.errors.full_messages
       )
     end
@@ -57,11 +50,11 @@ class Api::V1::IssuesController < ApplicationController
   def update
     if @issue.update_attributes(issue_params)
       json_response(
-        'Issue was successfully updated.', true, { issue: @issue }, :ok
+        'Issue was successfully updated.', true, { issue: @issue }, 200
       )
     else
       json_response(
-        'Issue was not updated.', false, {}, :unprocessable_entity,
+        'Issue was not updated.', false, {}, 422,
         errors: @issue.errors.full_messages
       )
     end
@@ -69,7 +62,7 @@ class Api::V1::IssuesController < ApplicationController
 
   def destroy
     @issue.destroy
-    json_response 'Issue was successfully destroyed.', true, {}, :no_content
+    json_response 'Issue was successfully destroyed.', true, {}, 204
   end
 
   private
@@ -79,7 +72,7 @@ class Api::V1::IssuesController < ApplicationController
   end
 
   def issue_params
-    params.require(:issue).permit(:name, :description, :status, :project_id)
+    params.require(:issue).permit(:name, :description, :status, :project_id, :reporter_id, :assignee_id)
   end
 
   def columns

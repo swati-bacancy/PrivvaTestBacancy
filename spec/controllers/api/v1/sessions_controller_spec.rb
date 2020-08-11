@@ -2,57 +2,50 @@ require 'rails_helper'
 
 RSpec.describe Api::V1::SessionsController, type: :controller do
   include Devise::Test::ControllerHelpers
-  describe 'Without login' do
-    describe 'GET Product#index' do
-      context 'without store_id' do
-        it 'Get index' do
-          get :index
-          expect(response).to redirect_to stores_locations_path
-        end
+
+  before :each do
+    request.env['devise.mapping'] = Devise.mappings[:user]
+  end
+
+  describe 'POST Session#create' do
+    let(:user) { create(:user) }
+    context 'with valid attributes' do
+      it 'login' do
+        post :create, params: {
+          sign_in: { email: user.email, password: 'password'}
+        }
       end
+      it { expect(response).to have_http_status(:success) }
+    end
 
-      context 'with store_id' do
-        let(:store) { create(:store) }
-        it 'Get index' do
-          cookies['store_id'] = store.id
-          get :index
-          expect(response).to have_http_status(:success)
-        end
+    context 'with invalid attributes' do
+      it 'login' do
+        post :create, params: {
+          sign_in: { email: user.email, password: 'password1'}
+        }
       end
-
-      context 'with store_id and search' do
-        let(:store) { create(:store) }
-        let(:product) { create(:product) }
-
-        it 'Get index' do
-          cookies['store_id'] = store.id
-          get :index, params: { search: product.code }
-          expect(response).to have_http_status(:success)
-        end
-      end
-
-      context 'with store_id and filter in cookie' do
-        let(:store) { create(:store) }
-        let(:product) { create(:product) }
-
-        it 'Get index' do
-          cookies['store_id'] = store.id
-          cookies[:product_filters] = {price: '$10 - $25'}.to_json
-          get :index
-          expect(response).to have_http_status(:success)
-        end
-      end
-
-      context 'with store_id and filter' do
-        let(:store) { create(:store) }
-        let(:product) { create(:product) }
-
-        it 'Get index' do
-          cookies['store_id'] = store.id
-          get :index, params: { product_filters: { price: '$10 - $25' } }
-          expect(response).to have_http_status(:success)
-        end
-      end
+      it { expect(response).to have_http_status(:success) }
     end
   end
+
+  describe 'DELETE Session#destroy' do
+  let(:user) { create(:user) }
+  context 'with valid attributes' do
+    it 'logout' do
+      @request.headers['AUTH-TOKEN'] = user.authentication_token
+
+      delete :destroy
+    end
+    it { expect(response).to have_http_status(:success) }
+  end
+
+  context 'with invalid attributes' do
+    it 'logout' do
+      @request.headers['AUTH-TOKEN'] = 'test'
+
+      delete :destroy
+    end
+    it { expect(response).to have_http_status(:success) }
+  end
+end
 end

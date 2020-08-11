@@ -8,11 +8,12 @@ class Api::V1::SessionsController < Devise::SessionsController
 
   # sign in
   def create
+
     if @user.valid_password?(sign_in_params[:password])
       sign_in 'user', @user
-      json_response('Signed in successfully', true, { user: @user }, :ok)
+      json_response('Signed in successfully', true, { user: @user }, 200)
     else
-      json_response('Unauthorized', false, {}, :unauthorized)
+      json_response('Unauthorized', false, {}, 410)
     end
   end
 
@@ -20,7 +21,7 @@ class Api::V1::SessionsController < Devise::SessionsController
   def destroy
     sign_out @user
     @user.generate_new_authentication_token
-    json_response('Log out successfully', true, {}, :ok)
+    json_response('Log out successfully', true, {}, 400)
   end
 
   private
@@ -31,11 +32,11 @@ class Api::V1::SessionsController < Devise::SessionsController
 
   def load_user
     @user = User.find_for_database_authentication(email: sign_in_params[:email])
-    @user || json_response('Cannot get user', false, {}, :failure)
+    @user || json_response('Cannot get user', false, {}, 400)
   end
 
   def valid_token
     @user = User.find_by authentication_token: request.headers['AUTH-TOKEN']
-    @user || json_response('Invalid Token', false, {}, :failure)
+    @user || json_response('Invalid Token', false, {}, 400)
   end
 end

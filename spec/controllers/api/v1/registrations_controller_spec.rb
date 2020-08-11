@@ -32,7 +32,16 @@ RSpec.describe Api::V1::RegistrationsController, type: :controller do
     context 'with invalid attributes' do
       let(:user1) do
         post :create, params: {
-          user: attributes_for(:user, traits: [:invalid_user])
+          user: build(:user, :invalid).attributes
+        }
+      end
+
+      it { expect { user1 }.to change(User, :count).by(0) }
+    end
+
+    context 'params not exists' do
+      let(:user1) do
+        post :create, params: {
         }
       end
 

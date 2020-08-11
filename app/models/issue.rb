@@ -11,27 +11,4 @@ class Issue < ApplicationRecord
     ['In progress', 'in-progress'],
     %w[Complete complete]
   ].freeze
-
-  def readable_status
-    case status
-    when 'not-started'
-      'Not started'
-    when 'in-progress'
-      'In progress'
-    when 'complete'
-      'Complete'
-    end
-  end
-
-  def complete?
-    status == 'complete'
-  end
-
-  def in_progress?
-    status == 'in-progress'
-  end
-
-  def not_started?
-    status == 'not-started'
-  end
 end

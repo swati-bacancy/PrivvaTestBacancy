@@ -7,10 +7,10 @@ class Api::V1::RegistrationsController < Devise::RegistrationsController
   def create
     user = User.new(user_params)
     if user.save
-      json_response('Signed up successfully', true, { user: user }, :ok)
+      json_response('Signed up successfully', true, { user: user }, 200)
     else
       json_response(
-        'Something wrong', false, {}, :unprocessable_entity,
+        'Something wrong', false, {}, 422,
         user.errors.full_messages
       )
     end

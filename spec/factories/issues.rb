@@ -4,7 +4,8 @@ FactoryBot.define do
     status { 'not-started' }
 
     trait :invalid do
-      association :reporter, factory: :user
+      # association :reporter, factory: :user
+      status { 'not-started' }
     end
   end
 end
